@@ -33,6 +33,6 @@ MAIL_FAIL_SILENTLY = False
 MAIL_SERVER = 'localhost'
 DEFAULT_MAIL_SENDER = ('Bill Gate', 'test@example.com')
 #: Logging: recipients of error emails
-ADMINS=['swvist@gmail.com']
+ADMINS=[]
 #: Log file
 LOGFILE='error.log'
