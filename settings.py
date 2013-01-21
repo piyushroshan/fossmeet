@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
+import os
 #: The title of this site
-SITE_TITLE='HasGeek Funnel'
+SITE_TITLE='FOSSMeet Funnel'
 #: Support contact email
 SITE_SUPPORT_EMAIL = 'test@example.com'
 #: TypeKit code for fonts
@@ -9,7 +9,7 @@ TYPEKIT_CODE=''
 #: Google Analytics code UA-XXXXXX-X
 GA_CODE=''
 #: Database backend
-SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
+SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 #: Secret key
 SECRET_KEY = 'SvSGkI2jTTiThEnaHovGpAH_51m6tDTfiG4R2FaOD8qA2'
 #: Timezone
