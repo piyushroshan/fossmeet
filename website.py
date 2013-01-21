@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import logging
+import logging, os
 from flask.ext.assets import Environment, Bundle
 
 from app import app
