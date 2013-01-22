@@ -7,7 +7,7 @@ SITE_SUPPORT_EMAIL = 'test@example.com'
 #: TypeKit code for fonts
 TYPEKIT_CODE=''
 #: Google Analytics code UA-XXXXXX-X
-GA_CODE=''
+GA_CODE='UA-37864811-1'
 #: Database backend
 SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 #: Secret key
