@@ -49,5 +49,6 @@ if app.config['ADMINS']:
 
 
 if __name__ == '__main__':
+    models.db.create_all()
     port = int(os.environ.get('PORT', 5000))
     app.run('0.0.0.0', port, debug=True)
