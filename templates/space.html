@@ -30,7 +30,7 @@
   <h2 id="sections">Sections</h2>
   <ol>
     {% for section in sections -%}
-      <li>{{ section.title }} &mdash; {{ section.description }}</li>
+      <li>{{ section.title }} <!-- &mdash; {{ section.description }}</li> -->
     {% endfor -%}
   </ol>
 {%- endif %}
