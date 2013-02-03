@@ -43,7 +43,7 @@ def favicon():
 @app.route('/login')
 @lastuser.login_handler
 def login():
-    return {'scope': 'id email organizations'}
+    return {'scope': 'id email'}
 
 
 @app.route('/logout')
@@ -104,8 +104,10 @@ def viewspace(name):
         abort(404)
     description = Markup(space.description_html)
     sections = ProposalSpaceSection.query.filter_by(proposal_space=space).order_by('title').all()
-    proposals = Proposal.query.filter_by(proposal_space=space).order_by(db.desc('created_at')).all()
-    return render_template('space.html', space=space, description=description, sections=sections, proposals=proposals)
+    confirmed = Proposal.query.filter_by(proposal_space=space, confirmed=True).order_by(db.desc('created_at')).all()
+    unconfirmed = Proposal.query.filter_by(proposal_space=space, confirmed=False).order_by(db.desc('created_at')).all()
+    return render_template('space.html', space=space, description=description, sections=sections,
+        confirmed=confirmed, unconfirmed=unconfirmed)
 
 
 @app.route('/<name>/json')
@@ -174,6 +176,9 @@ def newsession(name):
         attr = getattr(form, name)
         attr.flags.markdown = True
     form.section.query = ProposalSpaceSection.query.filter_by(proposal_space=space, public=True).order_by('title')
+    if len(list(form.section.query.all())) == 0:
+        # Don't bother with sections when there aren't any
+        del form.section
     if request.method == 'GET':
         form.email.data = g.user.email
     if form.validate_on_submit():
@@ -210,25 +215,32 @@ def editsession(name, slug):
     proposal = Proposal.query.get(proposal_id)
     if not proposal:
         abort(404)
-    if proposal.user != g.user:
+    if proposal.user != g.user and not lastuser.has_permission('siteadmin'):
         abort(403)
     form = ProposalForm(obj=proposal)
     form.section.query = ProposalSpaceSection.query.filter_by(proposal_space=space, public=True).order_by('title')
+    if len(list(form.section.query.all())) == 0:
+        # Don't bother with sections when there aren't any
+        del form.section
     # Set markdown flag to True for fields that need markdown conversion
     markdown_attrs = ('description', 'objective', 'requirements', 'bio')
     for name in markdown_attrs:
         attr = getattr(form, name)
         attr.flags.markdown = True
-    if request.method == 'GET':
+    if proposal.user != g.user:
+        del form.speaking
+    elif request.method == 'GET':
         form.speaking.data = proposal.speaker == g.user
     if form.validate_on_submit():
         form.populate_obj(proposal)
         proposal.name = makename(proposal.title)
-        if form.speaking.data:
-            proposal.speaker = g.user
-        else:
-            if proposal.speaker == g.user:
-                proposal.speaker = None
+        if proposal.user == g.user:
+            # Only allow the speaker to change this status
+            if form.speaking.data:
+                proposal.speaker = g.user
+            else:
+                if proposal.speaker == g.user:
+                    proposal.speaker = None
         # Set *_html attributes after converting markdown text
         for name in markdown_attrs:
             attr = getattr(proposal, name)
@@ -405,7 +417,7 @@ def proposal_data(proposal):
             'speaker': proposal.speaker.fullname if proposal.speaker else None,
             'email': proposal.email if lastuser.has_permission('siteadmin') else None,
             'phone': proposal.phone if lastuser.has_permission('siteadmin') else None,
-            'section': proposal.section.title,
+            'section': proposal.section.title if proposal.section else None,
             'type': proposal.session_type,
             'level': proposal.technical_level,
             'objective': proposal.objective_html,
