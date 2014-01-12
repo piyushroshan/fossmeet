@@ -160,29 +160,32 @@ def newsection(name):
         return redirect(url_for('viewspace', name=space.name), code=303)
     return render_template('autoform.html', form=form, title="New section", submit="Create section")
 
-@app.route('/<space>/sections/<section>/edit', methods=['GET', 'POST'])
+@app.route('/<name>/sections/<section>/edit', methods=['GET', 'POST'])
 @lastuser.requires_permission('siteadmin')
-def section_edit(space, section):
-    form = SectionForm(obj=section, model=ProposalSpaceSection, parent=space)
+def section_edit(name, section):
+    space = ProposalSpace.query.filter_by(name=section).first()
+    section  = ProposalSpaceSection.query.filter_by(name=section).first()
+    form = SectionForm(obj=section)
     if form.validate_on_submit():
         form.populate_obj(section)
         db.session.commit()
-        flash(_("Your section has been edited"), 'info')
-        return redirect(space.url_for(), code=303)
-    return render_template('autoform.html', form=form, title=_("Edit section"), submit=_("Save changes")
+        flash("Your section has been edited", 'info')
+        return redirect(space.url_for('viewspace', name=space.name), code=303)
+    return render_template('autoform.html', form=form, title="Edit section", submit="Save changes")
 
-app.route('/<space>/sections/<section>/delete', methods=['GET', 'POST'])
+@app.route('/<space>/sections/<section>/delete', methods=['GET', 'POST'])
 @lastuser.requires_permission('siteadmin')
 def section_delete(space, section):
+    space = ProposalSpace.query.filter_by(name=section).first()
+    section  = ProposalSpaceSection.query.filter_by(name=section).first()
     form = ConfirmDeleteForm()
     if form.validate_on_submit():
         if 'delete' in request.form:
             db.session.delete(section)
             db.session.commit()
-            flash(_("Your section has been deleted"), 'info')
+            flash("Your section has been deleted", 'info')
         return redirect(space.url_for(), code=303)
-    return render_template('delete.html', form=form, title=_(u"Confirm delete"),
-        message=_(u"Do you really wish to delete section ‘{title}’?").format(title=section.title)
+    return render_template('delete.html', form=form, title="Confirm delete", message="Do you really wish to delete section '{title}' ?".format(title=section.title))
 
 @app.route('/<name>/new', methods=['GET', 'POST'])
 @lastuser.requires_login

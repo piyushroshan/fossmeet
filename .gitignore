@@ -9,3 +9,5 @@ test.db
 error.log
 .webassets-cache
 *~
+fossenv
+*.swp
