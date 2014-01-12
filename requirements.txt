@@ -1,7 +1,7 @@
 BeautifulSoup==3.2.1
 Flask==0.9
 Flask-Assets==0.8
-Flask-Lastuser==0.3.13
+Flask-Lastuser==0.3.2
 Flask-Mail==0.7.4
 Flask-OAuth==0.12
 Flask-OpenID==1.1.1
