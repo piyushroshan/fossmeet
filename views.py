@@ -31,7 +31,7 @@ url_re = re.compile(ur'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{
 
 @app.route('/')
 def index():
-    spaces = ProposalSpace.query.filter(ProposalSpace.status >= 1).filter(ProposalSpace.status <= 4).order_by('date').all()
+    spaces = ProposalSpace.query.filter(ProposalSpace.status >= 1).filter(ProposalSpace.status <= 4).order_by(db.desc('date')).all()
     return render_template('index.html', spaces=spaces)
 
 
@@ -184,7 +184,7 @@ def section_delete(space, section):
             db.session.delete(section)
             db.session.commit()
             flash("Your section has been deleted", 'info')
-        return redirect(space.url_for(), code=303)
+        return redirect(space.url_for('viewspace', name=space.name), code=303)
     return render_template('delete.html', form=form, title="Confirm delete", message="Do you really wish to delete section '{title}' ?".format(title=section.title))
 
 @app.route('/<name>/new', methods=['GET', 'POST'])
